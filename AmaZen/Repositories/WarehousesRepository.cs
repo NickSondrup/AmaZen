@@ -17,8 +17,17 @@ namespace AmaZen.Repositories
 
     internal List<Warehouse> Get()
     {
-      var sql = "SELECT * FROM warehouses;";
-      return _db.Query<Warehouse>(sql).ToList();
+     var sql = @"
+      SELECT 
+      w.*,
+      a.*
+      FROM warehouses w
+      JOIN accounts a on a.id = w.creatorId
+      ";
+      return _db.Query<Warehouse, Account, Warehouse>(sql, (w, a) => {
+        w.Creator = a;
+        return w;
+      }).ToList();
     }
 
     internal Warehouse Post(Warehouse warehouseData)
